@@ -28,16 +28,13 @@ const destJs = "./server/build";
 const gulp = require('gulp');
 const babel = require('gulp-babel');
 const sass = require('gulp-sass');
-const spawn = require('child_process').spawn;
-let node;
+const exec = require('gulp-exec');
 
 gulp.task('dev', function() {
 
-	gulp.series['server'];
-
 	// return gulp.series(['watchCss', 'watchJs']);
 	gulp.watch(srcSass, gulp.series(['sass']));
-	gulp.watch(srcJs, gulp.series(['babel', 'server']));
+	gulp.watch(srcJs, gulp.series(['babel']));
 
 });
 
@@ -61,16 +58,4 @@ gulp.task('babel', function() {
 	return gulp.src(srcJs)
 		.pipe(babel())
 		.pipe(gulp.dest(destJs));
-});
-
-gulp.task('server', function() {
-	if(node) node.kill();
-
-	node = spawn('node', ['./server/build/index.js'], {stdio: 'inherit'});
-
-	node.on('close', (code) => {
-		if(code === 8) {
-			gulp.log('Error detected, waiting for canges');
-		}
-	});
 });

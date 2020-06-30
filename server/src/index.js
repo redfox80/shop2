@@ -1,20 +1,13 @@
-require('babel-polyfill');
+/* eslint-disable no-console */
+const logger = require('./logger');
+const app = require('./app');
+const port = app.get('port');
+const server = app.listen(port);
 
-import dotenv from 'dotenv';
-import express from 'express';
-import feathers from '@feathersjs/feathers';
-import morgan from 'morgan';
-import helmet from 'helmet';
-import path from 'path';
+process.on('unhandledRejection', (reason, p) =>
+  logger.error('Unhandled Rejection at: Promise ', p, reason)
+);
 
-dotenv.config();
-
-const app = express(feathers());
-
-app.use(morgan('dev'));
-app.use(helmet());
-
-const staticPath = path.join(`${__dirname}`, '..', '..', 'client');
-app.use(express.static(staticPath));
-
-app.listen(process.env.PORT);
+server.on('listening', () =>
+  logger.info('Feathers application started on http://%s:%d', app.get('host'), port)
+);
